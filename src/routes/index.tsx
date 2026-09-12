@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { Search, Settings, TrendingUp, BarChart3, Globe2 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
@@ -74,9 +74,20 @@ function buildRows(seed: string): Row[] {
 }
 
 function KeywordTool() {
+  const searchParams = Route.useSearch();
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [submitted, setSubmitted] = useState("");
   const rows = useMemo(() => (submitted ? buildRows(submitted) : []), [submitted]);
+
+  useEffect(() => {
+    const q = searchParams.q?.trim();
+    if (q) {
+      setQuery(q);
+      setSubmitted(q);
+      void navigate({ to: "/", search: {}, replace: true });
+    }
+  }, [searchParams.q, navigate]);
 
   return (
     <div className="min-h-screen bg-background">
