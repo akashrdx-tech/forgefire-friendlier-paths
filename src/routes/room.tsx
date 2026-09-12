@@ -25,6 +25,10 @@ import { UserAvatar } from "@/components/chat/UserAvatar";
 import { AvatarCropper } from "@/components/chat/AvatarCropper";
 import { MediaViewer, type ViewerItem } from "@/components/chat/MediaViewer";
 import { getNicknames } from "@/lib/chat-prefs";
+import { loadVault, removePin, setUnlockedLocally, type VaultState } from "@/lib/chat-vault";
+import { isSecureRoom, setSecureRoom } from "@/lib/secure-room";
+import { SecureShield } from "@/components/chat/SecureShield";
+import { VaultGate } from "@/components/chat/VaultGate";
 import { useSignedUrl } from "@/components/SignedImage";
 import { uploadFile } from "@/lib/media";
 import { Button } from "@/components/ui/button";
@@ -69,10 +73,31 @@ function RoomPage() {
   const [results, setResults] = useState<Profile[]>([]);
   const [sentTo, setSentTo] = useState<string[]>([]);
   const [nicknames, setNicknames] = useState<Record<string, string>>({});
+  const [vault, setVault] = useState<VaultState>({ hasPin: false, unlocked: false, hint: null });
+  const [vaultReady, setVaultReady] = useState(false);
+  const [secure, setSecure] = useState(false);
 
   // Leaving the app re-locks the private area, so the access key is needed again.
   useAppLock(Boolean(session));
   const viewportHeight = useViewportHeight();
+
+  const refreshVault = useCallback(async () => {
+    if (!session) return;
+    setVault(await loadVault(session.user.id));
+    setVaultReady(true);
+  }, [session?.user.id]);
+
+  useEffect(() => {
+    void refreshVault();
+  }, [refreshVault]);
+
+  useEffect(() => {
+    if (!session) return;
+    const sync = () => setSecure(isSecureRoom(session.user.id));
+    sync();
+    window.addEventListener("srt-secure-room", sync);
+    return () => window.removeEventListener("srt-secure-room", sync);
+  }, [session?.user.id]);
 
   useEffect(() => {
     if (loading) return;

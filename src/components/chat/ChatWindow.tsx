@@ -1091,7 +1091,16 @@ function MessageRow({
   }, {});
 
   const beginLongPress = () => {
-    longPress.current = setTimeout(() => onToggleSelect(), 450);
+    cancelLongPress();
+    longPress.current = setTimeout(() => {
+      longPress.current = null;
+      try {
+        navigator.vibrate?.(18);
+      } catch {
+        /* vibration is optional */
+      }
+      onToggleSelect();
+    }, 420);
   };
   const cancelLongPress = () => {
     if (longPress.current) clearTimeout(longPress.current);
@@ -1101,21 +1110,30 @@ function MessageRow({
   const onTouchStart = (e: React.TouchEvent) => {
     startX.current = e.touches[0]?.clientX ?? null;
     startY.current = e.touches[0]?.clientY ?? null;
-    if (!selectMode) beginLongPress();
+    beginLongPress();
   };
   const onTouchMove = (e: React.TouchEvent) => {
     if (startX.current === null) return;
     const dx = (e.touches[0]?.clientX ?? 0) - startX.current;
     const dy = (e.touches[0]?.clientY ?? 0) - (startY.current ?? 0);
-    if (Math.abs(dx) > 8 || Math.abs(dy) > 8) cancelLongPress();
+    if (Math.abs(dx) > 12 || Math.abs(dy) > 12) cancelLongPress();
     if (dx > 0 && Math.abs(dy) < 30 && !selectMode) setOffset(Math.min(dx, 70));
   };
   const onTouchEnd = () => {
+    const wasPending = longPress.current !== null;
     cancelLongPress();
     if (offset > 45) onReply();
+    else if (!wasPending && !selectMode) {
+      // long press already fired — do not treat the release as a tap
+    }
     setOffset(0);
     startX.current = null;
     startY.current = null;
+  };
+
+  // Desktop: hold the mouse button down to enter selection mode too.
+  const onMouseDown = (e: React.MouseEvent) => {
+    if (e.button === 0) beginLongPress();
   };
 
 
@@ -1131,16 +1149,20 @@ function MessageRow({
 
   return (
     <div
-      className={`group relative flex items-center gap-2 rounded-lg px-1 py-0.5 transition-colors ${
+      className={`msg-row group relative flex items-center gap-2 rounded-lg px-1 py-0.5 transition-colors ${
         isSelected ? "bg-primary/25 ring-1 ring-primary/40" : ""
-      } ${selectMode ? "cursor-pointer select-none" : ""} ${mine ? "justify-end" : "justify-start"}`}
+      } ${selectMode ? "cursor-pointer" : ""} ${mine ? "justify-end" : "justify-start"}`}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
       onTouchCancel={onTouchEnd}
+      onMouseDown={onMouseDown}
+      onMouseUp={cancelLongPress}
+      onMouseLeave={cancelLongPress}
       onContextMenu={(e) => {
         e.preventDefault();
-        onToggleSelect();
+        cancelLongPress();
+        if (!selectMode) onToggleSelect();
       }}
       onClick={() => {
         if (selectMode) onToggleSelect();
@@ -1149,6 +1171,7 @@ function MessageRow({
         if (!selectMode) onOpenPicker();
       }}
     >
+
       {selectMode && (
         <span
           aria-hidden
