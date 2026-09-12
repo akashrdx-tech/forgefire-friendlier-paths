@@ -1,0 +1,19 @@
+{
+  "capabilities": [
+    {"capability": "code", "source": "github:akashrdx-tech/forgefire-connections", "outcome": "migrated", "status": "verified", "next_action": null},
+    {"capability": "schema", "source": "source migrations (consolidated)", "outcome": "0001_initial_schema applied", "status": "verified", "next_action": null},
+    {"capability": "records", "source": "none", "outcome": "no records exported", "status": "n/a", "next_action": null},
+    {"capability": "auth_identities", "source": "none", "outcome": "no existing users", "status": "n/a", "next_action": null},
+    {"capability": "auth_provider", "source": "email/password (Lovable Cloud)", "outcome": "enabled", "status": "verified", "next_action": null},
+    {"capability": "authorization", "source": "RLS policies on all tables", "outcome": "migrated", "status": "verified", "next_action": null},
+    {"capability": "storage", "source": "chat-media, avatars buckets", "outcome": "buckets created + policies applied", "status": "verified", "next_action": null},
+    {"capability": "realtime", "source": "messages, friend_requests, call_signals, profiles", "outcome": "publication configured", "status": "verified", "next_action": null},
+    {"capability": "gate_auth", "source": "hardcoded key in gate.functions.ts", "outcome": "preserved as-is", "status": "verified", "next_action": null},
+    {"capability": "public_endpoints", "source": "none", "outcome": "n/a", "status": "n/a", "next_action": null},
+    {"capability": "webhooks", "source": "none", "outcome": "n/a", "status": "n/a", "next_action": null},
+    {"capability": "schedules", "source": "none", "outcome": "n/a", "status": "n/a", "next_action": null},
+    {"capability": "secrets", "source": "none required (source .env excluded)", "outcome": "n/a", "status": "n/a", "next_action": null},
+    {"capability": "cutover", "source": "n/a", "outcome": "no external providers to cut over", "status": "n/a", "next_action": null},
+    {"capability": "verification", "source": "playwright route checks", "outcome": "all routes 200, no console errors", "status": "verified", "next_action": null}
+  ]
+}
