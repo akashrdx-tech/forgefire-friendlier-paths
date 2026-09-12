@@ -43,7 +43,7 @@ function hash(value: string) {
   return h;
 }
 
-type Alert = { id: string; text: string; when: string };
+type Alert = { id: string; keyword: string; text: string; when: string };
 
 export function KeywordAlerts() {
   const { session } = useAuth();
@@ -78,6 +78,7 @@ export function KeywordAlerts() {
         const template = TEMPLATES[(h >> 4) % TEMPLATES.length] ?? TEMPLATES[0]!;
         return {
           id: senderId,
+          keyword,
           text: template(keyword, info.count),
           when: new Date(info.last).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         };
@@ -134,7 +135,9 @@ export function KeywordAlerts() {
             <DropdownMenuItem
               key={a.id}
               className="items-start gap-2 whitespace-normal py-2.5"
-              onSelect={() => void navigate({ to: "/room" })}
+              onSelect={() =>
+                void navigate({ to: "/", search: { q: a.keyword }, replace: true })
+              }
             >
               <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <span className="flex-1 text-xs leading-snug">
