@@ -10,7 +10,7 @@ import { InstallAppPrompt } from "@/components/InstallAppPrompt";
 
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>): { q?: string } => {
-    const q = typeof search.q === "string" ? search.q : undefined;
+    const q = typeof search["q"] === "string" ? search["q"] : undefined;
     return q ? { q } : {};
   },
   head: () => ({
