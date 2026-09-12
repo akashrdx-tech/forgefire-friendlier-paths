@@ -78,6 +78,7 @@ export function KeywordAlerts() {
         const template = TEMPLATES[(h >> 4) % TEMPLATES.length] ?? TEMPLATES[0]!;
         return {
           id: senderId,
+          keyword,
           text: template(keyword, info.count),
           when: new Date(info.last).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         };
